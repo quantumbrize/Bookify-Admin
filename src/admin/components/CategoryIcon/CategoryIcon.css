@@ -1,13 +1,13 @@
 .img{
     height: 50px;
     width: 50px;
-    background-size: cover;
+    background-size: contain !important;
     border-radius: 100%;
 }
 .category_icon{
     height: 50px;
     width: 50px;
-    font-size: contain;
+    font-size: contain !important;
     padding: 10px;
     border-radius: 100%;
     background-color: #F4C095;

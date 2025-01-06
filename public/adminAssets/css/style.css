@@ -7248,9 +7248,6 @@ select.h40 {
     flex-wrap: wrap;
   }
 
-  .upload-image .item {
-    width: 48%;
-  }
 }
 
 @media (max-width: 1024px) {

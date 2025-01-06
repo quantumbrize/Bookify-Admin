@@ -9,28 +9,17 @@ import { useNavigate } from 'react-router-dom';
 
 function CategoryForm() {
 
-    const [isActive, setIsActive] = useState(0);
-    const [isNewTag, setIsNewTag] = useState(0);
-    const [isStoreOnly, setIsStoreOnly] = useState(0);
+    const [isActive, setIsActive] = useState(false);
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [categoryName, setCategoryName] = useState('');
-    const [metaTitle, setMetaTitle] = useState('');
-    const [metaDescription, setMetaDescription] = useState('');
     const fileInputRef = useRef(null);
-    const [newTagText, setNewTagText] = useState('');
-
-    const [selectedListType, setSelectedListType] = useState('Select Category List Type');
-    const [selectedListTypeList, setSelectedListTypeList] = useState([]);
-    const [isOpenListType, setIsOpenListType] = useState(false);
     const listTypeMenuRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false)
 
     const navigate = useNavigate();
 
-    useOutsideClickListener(listTypeMenuRef, () => {
-        setIsOpenListType(false);
-    })
+
 
     const addCategory = async (event) => {
         event.preventDefault(); // Prevent default form submission
@@ -46,14 +35,10 @@ function CategoryForm() {
 
             let jsonData = {
                 file: fileData,
-                name: categoryName,
-                new_tag_text: newTagText,
-                list_type: selectedListType,
-                meta_title: metaTitle,
-                meta_description: metaDescription,
-                new_tag: isNewTag,
+                title: categoryName,
                 status: isActive,
-                isStoreOnly: isStoreOnly
+                type: 'parent',
+                parentId: null,
             }
 
 
@@ -69,10 +54,6 @@ function CategoryForm() {
                 });
                 setIsLoading(false);
                 return;
-            }else if (selectedListType == 'Select Category List Type'){
-                toast.error('please add Category List Type', {
-                    position: 'top-center',
-                });
             }else {
                 // Send the request
                 const response = await fetch(`${config.backEndBaseUrl}api/category/add`, {
@@ -108,24 +89,14 @@ function CategoryForm() {
         }
     };
 
-    useEffect(() => {
-        setSelectedListTypeList(['List_type', 'Bg_image_type'])
-    }, [])
 
 
     const resetForm = () => {
-        // setSelectedIcon('FaList');
-        // setIsOpen(false);
-        // setSearchTerm('');
-        setIsActive(1);
-        setIsNewTag(1);
         setFile(null);
         setPreview(null);
         setCategoryName('');
-        setMetaTitle('');
-        setMetaDescription('');
         if (fileInputRef.current) {
-            fileInputRef.current.value = ''; // Reset file input
+            fileInputRef.current.value = ''; 
         }
     };
 
@@ -145,26 +116,9 @@ function CategoryForm() {
     };
 
     const handleIsActiveCheckboxChange = () => {
-        setIsActive(isActive == 1 ? 0 : 1);
+        setIsActive(!isActive);
     };
 
-    const handleIsNewTagCheckboxChange = () => {
-        setIsNewTag(isNewTag == 1 ? 0 : 1);
-    };
-
-    const handleIsStoreOnlyChange = () => {
-        setIsStoreOnly(isStoreOnly == 1 ? 0 : 1);
-    }
-
-    const handleIsNewTagTextChange = (event) => {
-        setNewTagText(event.target.value);
-    }
-
-   
-    const handleListTypeChange = (type) => {
-        setSelectedListType(type);
-        setIsOpenListType(false);
-    };
     return (
         <>
             <ToastContainer />
@@ -183,7 +137,7 @@ function CategoryForm() {
                                     <span className="icon">
                                         <i className="icon-upload-cloud"></i>
                                     </span>
-                                    <span className="body-text">Drop your images here or select <span className="tf-color">click to browse</span>
+                                    <span className="body-text"><span className="tf-color">Click to browse Images</span>
                                     </span>
                                     <input type="file" id="myFile" onChange={handleFileChange} ref={fileInputRef} />
                                     {preview && (
