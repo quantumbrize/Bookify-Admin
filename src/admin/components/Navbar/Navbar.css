@@ -1,0 +1,10 @@
+#logo_header_mobile{
+    height: 50px !important;
+}
+.dropdown-menu li{
+    cursor: pointer;
+}
+.userImage{
+    height: 100%;
+    object-fit: cover;
+}
