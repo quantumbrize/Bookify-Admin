@@ -22,7 +22,6 @@ function CategoryList() {
     const [categoryCount, setCategoryCount] = useState(0);
     const [selectedOption, setSelectedOption] = useState({ value: 'all', label: 'All' });
     const [categoryList, setCategoryList] = useState([]);
-    const [selectedOptionSubCat, setSelectedOptionSubCat] = useState({ value: 'all', label: 'All' });
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [isClearBtnShown, setIsClearBtnShown] = useState(false)
@@ -114,12 +113,6 @@ function CategoryList() {
 
             let categoryList = result.data;
 
-            // Filter based on sub-categories condition
-            if (selectedOptionSubCat.value == 1) {
-                categoryList = categoryList.filter(item => item.sub_categories > 0);
-            } else if (selectedOptionSubCat.value == 0) {
-                categoryList = categoryList.filter(item => item.sub_categories == 0);
-            }
 
             // Filter based on dates
             if (dates) {
@@ -140,162 +133,13 @@ function CategoryList() {
         }
     };
 
-    const EditableCell = ({ id, initialValue, onSave }) => {
-        const [value, setValue] = useState(initialValue);
-        const [isChanged, setIsChanged] = useState(false);
-        const [isLoading, setIsLoading] = useState(false);
-
-        useEffect(() => {
-            setIsChanged(value !== initialValue);
-        }, [value, initialValue]);
-
-        const handleInputChange = (e) => {
-            setValue(e.target.value);
-        };
-
-        const handleSave = async () => {
-            setIsLoading(true);
-            await onSave(id, value);
-            setIsLoading(false);
-            setIsChanged(false);
-        };
-
-        return (
-            <div className="editable-cell">
-                <input
-                    className="editable-input"
-                    type="number"
-                    value={value}
-                    onChange={handleInputChange}
-                    disabled={isLoading}
-                />
-                {isChanged && (
-                    <button
-                        className="editable-button"
-                        onClick={handleSave}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <div className="spinner">
-                                {/* Spinner CSS here */}
-                            </div>
-                        ) : (
-                            'Update'
-                        )}
-                    </button>
-                )}
-            </div>
-        );
-    };
 
     useEffect(() => {
         getCategories(selectedOption.value);
-    }, [selectedOption.value, selectedOptionSubCat]);
+    }, [selectedOption.value]);
 
     const columns = useMemo(
-        () => [
-            {
-                accessorKey: 'position',
-                header: 'Position',
-                Cell: ({ row, cell }) => (
-                    <EditableCell
-                        id={row.original.uid}
-                        initialValue={cell.getValue()}
-                        onSave={handleSave}
-                    />
-                ),
-            },
-            {
-                accessorKey: 'icon',
-                header: 'Icon / Image',
-                Cell: ({ cell }) => {
-                    const { icon_type, icon_img_path } = cell.row.original;
-                    return icon_type === 'icon' ? (
-                        <DynamicFaIcon iconName={cell.getValue()} />
-                    ) : (
-                        <CategoryRoundIcon imgPath={config.backEndBaseUrl + icon_img_path} />
-                    );
-                },
-            },
-            {
-                accessorKey: 'name',
-                header: `Categories (${categoryList.length})`,
-            },
-            {
-                accessorKey: 'sub_categories',
-                header: `Sub-Categories (${categoryList.reduce((acc, category) => acc + (category.sub_categories || 0), 0)})`,
-                Cell: ({ cell }) => (
-                    <Link className='btn btn-lg btn-success' to={`/admin/sub-category/list/${cell.row.original.uid}`}>
-                        View {cell.getValue()}
-                    </Link>
-                ),
-            },
-            {
-                accessorKey: 'store',
-                header: `Stores (${categoryList.reduce((sum, category) => sum + category.store_count, 0)})`,
-                Cell: ({ cell }) => (
-                    <Link className='btn btn-lg btn-success' to={`/admin/store/list?cid=${cell.row.original.uid}`}>
-                        View {cell.row.original.store_count}
-                    </Link>
-                ),
-            },
-            {
-                accessorKey: 'status',
-                header: 'Hide/Unhide',
-                Cell: ({ cell }) => (
-                    <ToggleButton
-                        uid={cell.row.original.uid}
-                        initialStatus={cell.getValue() === 1}
-                        onUpdate={() => getCategories(selectedOption.value)}
-                    />
-                ),
-            },
-            {
-                accessorKey: 'meta_title',
-                header: 'Meta Title',
-            },
-            {
-                accessorKey: 'meta_description',
-                header: 'Meta Description',
-            },
-            {
-                accessorKey: 'new_tag_text',
-                header: 'New Tag Text',
-            },
-            {
-                accessorKey: 'created_by',
-                header: 'Created By',
-            },
-            {
-                accessorKey: 'created_at',
-                header: 'Created On',
-            },
-            {
-                accessorKey: 'uid',
-                header: 'Action',
-                Cell: ({ cell }) => (
-                    <>
-                        <div className='actionBtn btn btn-lg btn-danger m-2' onClick={() => handleDelete(cell.row.original.uid)}>
-                            <FaRegTrashAlt />
-                        </div>
-                        <Link className='actionBtn btn btn-lg btn-dark text-light' to={`/admin/category/update/${cell.row.original.uid}`}>
-                            <FaEdit />
-                        </Link>
-                    </>
-                ),
-            },
-            {
-                accessorKey: 'uid',
-                header: 'analytics',
-                Cell: ({ cell }) => (
-                    <>
-                        <Link className='actionBtn btn btn-lg btn-success' to={`/admin/leads/${cell.row.original.uid}`}>
-                            <FaEye /> {cell.row.original.total_leads}
-                        </Link>
-                    </>
-                ),
-            },
-        ],
+        () => [],
         [selectedOption.value, categoryList]
     );
 
@@ -310,47 +154,6 @@ function CategoryList() {
         getCategories(selectedOption.value);
     };
 
-    const optionSubCat = useMemo(() => [
-        { value: 'all', label: 'All' },
-        { value: 1, label: 'With sub-category' },
-        { value: 0, label: 'Without sub-category' },
-    ], []);
-
-    const handleChangeOfSubCat = (selectedOptionSubCat) => {
-        setSelectedOptionSubCat(selectedOptionSubCat);
-        getCategories(selectedOption.value)
-    };
-
-    const handleSave = async (id, value) => {
-        if (!value) {
-            toast.error('Please Select a value', {
-                position: 'top-center',
-            });
-        } else {
-            try {
-                const response = await fetch(`${config.backEndBaseUrl}api/category/update/rank/${id}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ rank: value }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                if (result.status) {
-                    toast.success('Position Updated', {
-                        position: 'top-center',
-                    });
-                    await getCategories(selectedOption.value);
-                }
-            } catch (error) {
-                console.error('Updating category rank failed', error);
-            }
-        }
-    };
 
     const handleDateChange = (newStartDate, newEndDate) => {
         // console.log(newStartDate, newEndDate);
@@ -403,11 +206,6 @@ function CategoryList() {
                                                     options={options}
                                                     onChange={handleChange}
                                                     value={options.find(option => option.value === selectedOption.value)}
-                                                />
-                                                <CustomSelect
-                                                    options={optionSubCat}
-                                                    onChange={handleChangeOfSubCat}
-                                                    value={optionSubCat.find(option => option.value === selectedOptionSubCat.value)}
                                                 />
                                                 <div style={{
                                                     display: 'flex',

@@ -46,7 +46,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* background-color: #ccc; */
+  background-color: #ccc;
+  width: 60px;
   -webkit-transition: .4s;
   transition: .4s;
 }

@@ -175,16 +175,6 @@ function CategoryForm() {
                         <input className="flex-grow" type="text" placeholder="Category name" value={categoryName} onChange={(e) => setCategoryName(e.target.value)} />
                     </fieldset>
 
-                    <fieldset className="name">
-                        <div className="body-title">Meta Title:</div>
-                        <input className="flex-grow" type="text" placeholder="Meta title" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} />
-                    </fieldset>
-
-                    <fieldset className="name">
-                        <div className="body-title">Meta Description:</div>
-                        <input className="flex-grow" type="text" placeholder="Meta descriptions" value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} />
-                    </fieldset>
-
                     <fieldset>
                         <div className="body-title">Upload icon: <span className="tf-color-1">*</span></div>
                         <div className="upload-image flex-grow">
@@ -207,33 +197,6 @@ function CategoryForm() {
                     </fieldset>
 
 
-                    <fieldset className="name">
-                        <div className="body-title">Catrgory List Type: <span className="tf-color-1">*</span></div>
-                        <div className="custom-select-container" ref={listTypeMenuRef}>
-                            <div className="custom-selected-item" onClick={() => setIsOpenListType(!isOpenListType)}>
-                                <span>{selectedListType}</span>
-                            </div>
-                            {isOpenListType && (
-                                <div className="custom-dropdown-menu">
-                                    <ul className="custom-dropdown-list">
-                                        {selectedListTypeList.map((item, index) => (
-                                            <li key={index} onClick={() => handleListTypeChange(item)} className="custom-dropdown-item">
-                                                <span>{item}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <div className="body-title">Store Only:</div>
-                        <label className="switch">
-                            <input type="checkbox" checked={isStoreOnly} onChange={handleIsStoreOnlyChange} />
-                            <span className="slider round"></span>
-                        </label>
-                    </fieldset>
 
                     <fieldset>
                         <div className="body-title">Category Disable/Enable:</div>
@@ -243,18 +206,6 @@ function CategoryForm() {
                         </label>
                     </fieldset>
 
-                    <fieldset>
-                        <div className="body-title">Category New Tag:</div>
-                        <label className="switch">
-                            <input type="checkbox" checked={isNewTag} onChange={handleIsNewTagCheckboxChange} />
-                            <span className="slider round"></span>
-                        </label>
-                    </fieldset>
-
-                    <fieldset>
-                        <div className="body-title">Category New Tag Text:</div>
-                        <input className="flex-grow" type="text" placeholder="Category New Tag Text" value={newTagText} onChange={handleIsNewTagTextChange} />
-                    </fieldset>
 
                     <div className="bot">
                         <div></div>

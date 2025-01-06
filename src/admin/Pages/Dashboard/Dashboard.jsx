@@ -50,16 +50,16 @@ function Dashboard() {
                             <div className="section-content-right">
                                 <div className="main-content" style={{ paddingLeft: isSidebar ? '280px' : '0px' }}>
                                     <div className="main-content-inner">
-                                        <TopDefaultCharts />
-                                        <Users users={users} />
-                                        <ProductOverview />
+                                        {/* <TopDefaultCharts /> */}
+                                        {/* <Users users={users} /> */}
+                                        {/* <ProductOverview /> */}
                                         <br />
                                         <br />
-                                        <Vendor />
-                                        <div className="tf-section-6 mb-30">
+                                        {/* <Vendor /> */}
+                                        {/* <div className="tf-section-6 mb-30">
                                             <CustomerGrowth />
                                             <Revenue />
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>

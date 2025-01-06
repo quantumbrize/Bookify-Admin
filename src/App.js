@@ -52,6 +52,7 @@ const StoreComments = lazy(() => import('./admin/Pages/StoreComments/StoreCommen
 const Leads = lazy(() => import('./admin/Pages/Leads/Leads'))
 const UserLeads = lazy(() => import('./admin/Pages/UserLeads/UserLeads'))
 const UpdateComment = lazy(() => import('./admin/Pages/StoreComments/UpdateComment/UpdateComment'))
+const AdminAbout = lazy(() => import('./admin/Pages/AdminAbout/AdminAbout'))
 const AddMember = lazy(() => import('./admin/Pages/AdminAbout/AddMember/AddMember'))
 const UpdateAbout = lazy(() => import('./admin/Pages/AdminAbout/UpdateAbout/UpdateAbout'))
 
@@ -62,13 +63,7 @@ function App() {
 		loadAssets(isAdmin);
 	}, []);
 
-
-
 	let currentAdmin = localStorage.getItem('adminAuthToken');
-	// let currentVendor = true;
-
-
-
 
 	// Admin layout start
 	const ProtectedRouteAdmin = ({ children }) => {

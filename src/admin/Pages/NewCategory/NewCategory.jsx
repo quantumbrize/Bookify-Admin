@@ -1,59 +1,34 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import SectionMenuLeft from '../../components/SectionMenuLeft/SectionMenuLeft';
-// import BreadCrumbs from '../../components/BreadCrumbs/BreadCrumbs';
 import CategoryForm from './CategoryForm';
 import { AdminSidebarContext } from '../../../context/adminSidebarContext';
-import { useContext } from 'react';
 
 function NewCategory() {
 	const { isSidebar } = useContext(AdminSidebarContext);
 
 	return (
-		<>
-			<div class="body">
-
-				{/*  #wrapper  */}
-				<div id="wrapper">
-					{/*  #page  */}
-					<div id="page" class="">
-						{/*  layout-wrap  */}
-						<div class="layout-wrap">
-
-							<SectionMenuLeft />
-							{/*  /section-menu-left  */}
-							{/*  section-content-right  */}
-							<div class="section-content-right">
-								{/*  main-content  */}
-								<div class="main-content" style={{ paddingLeft: isSidebar ? '280px' : '0px' }}>
-									{/*  main-content-wrap  */}
-									<div class="main-content-inner">
-										{/*  main-content-wrap  */}
-										<div class="main-content-wrap">
-											<div class="flex items-center flex-wrap justify-between gap20 mb-27">
-												<h3>Category information</h3>
-												{/* <BreadCrumbs /> */}
-											</div>
-											{/*  new-category  */}
-											<CategoryForm />
-											{/*  /new-category  */}
+		<div className="body">
+			<div id="wrapper">
+				<div id="page">
+					<div className="layout-wrap">
+						<SectionMenuLeft />
+						<div className="section-content-right">
+							<div className="main-content" style={{ paddingLeft: isSidebar ? '280px' : '0px' }}>
+								<div className="main-content-inner">
+									<div className="main-content-wrap">
+										<div className="flex items-center flex-wrap justify-between gap20 mb-27">
+											<h3>Add New Category</h3>
 										</div>
-										{/*  /main-content-wrap  */}
+										<CategoryForm />
 									</div>
-									{/*  /main-content-wrap  */}
 								</div>
-								{/*  /main-content  */}
 							</div>
-							{/*  /section-content-right  */}
 						</div>
-						{/*  /layout-wrap  */}
 					</div>
-					{/*  /#page  */}
 				</div>
-				{/*  /#wrapper  */}
 			</div>
-
-		</>
-	)
+		</div>
+	);
 }
 
-export default NewCategory
+export default NewCategory;
