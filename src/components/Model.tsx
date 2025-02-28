@@ -53,13 +53,13 @@ const Modal = ({ isOpen, onClose, type, title, message }: ModalProps) => {
           </button>
         </div>
 
-        {/* Body */}
-        <div className="px-6 py-4">
-  <p
-    className="text-gray-600"
-    dangerouslySetInnerHTML={{ __html: message }}
-  ></p>
-</div>
+        {/* Body - Added min-h, max-h, and overflow-y-auto */}
+        <div className="px-6 py-4 max-h-[400px] min-h-[100px] overflow-y-auto">
+          <p
+            className="text-gray-600"
+            dangerouslySetInnerHTML={{ __html: message }}
+          ></p>
+        </div>
 
         {/* Footer */}
         <div className="px-6 py-4 bg-gray-50 flex justify-end">

@@ -10,6 +10,7 @@ import Modal from "../Model";
 import { ModalType } from "../../interfaces/ModelProps";
 import toast from "react-hot-toast";
 import formatCSVErrors from "../../utils/FormatCSVErrors";
+import Papa from "papaparse";
 
 interface Address {
   street: string;
@@ -28,7 +29,7 @@ interface MerchantData {
   licenseNumber: string;
   status: string;
 }
-
+const VARIANT_UPLOAD_HEADERS = ["variantId", "updateType"];
 const ProductManagement: React.FC = () => {
   const [merchantId, setMerchantId] = useState<string>("");
   const [merchantData, setMerchantData] = useState<MerchantData | null>(null);
@@ -42,7 +43,9 @@ const ProductManagement: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadLoading, setUploadLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [downloadLoading, setdownloadLoading] = useState(false);
+  const [downloadLoadingMain, setdownloadLoadingMain] = useState(false);
+  const [downloadLoadingVariant, setdownloadLoadingVariant] = useState(false);
+  const [updateLoadingVariant, setuploadLoadingVariant] = useState(false);
 
   const fetchMerchantData = async () => {
     const validId = validateMongoDbObjectId(merchantId, setError);
@@ -131,44 +134,89 @@ const ProductManagement: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const downloadCsv = async (type:string) => {
+  const downloadCsv = async (type: string) => {
     try {
-      setdownloadLoading(true);
+      if (type === "main") {
+        setdownloadLoadingMain(true);
+      } else if (type === "variant") {
+        setdownloadLoadingVariant(true);
+      } else {
+        setuploadLoadingVariant(true);
+      }
       await handleDocumentDownload(type);
     } catch (error) {
       console.error(error);
     } finally {
-      setdownloadLoading(false);
+      setdownloadLoadingMain(false);
+      setdownloadLoadingVariant(false);
+      setuploadLoadingVariant(true);
     }
+  };
+
+  const getCsvType = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        complete: (result) => {
+          const headers = result.data[0] as string[] | undefined; // Ensure headers are an array
+
+          if (!Array.isArray(headers)) {
+            reject("Invalid CSV: Headers not found or incorrect format.");
+            return;
+          }
+
+          const isVariantUpload = VARIANT_UPLOAD_HEADERS.every((h) =>
+            headers.includes(h)
+          );
+
+          resolve(isVariantUpload ? "variantUpload" : "mainUpload");
+        },
+        error: () => {
+          reject("Error parsing CSV file.");
+        },
+        preview: 1, // Read only the first row
+        skipEmptyLines: true,
+      });
+    });
   };
 
   const handleFileUpload = async () => {
     try {
+      const csvType = await getCsvType(selectedFile!);
       setUploadLoading(true);
-      const res = await handleDocumentUpload(selectedFile!, merchantId);
+      let route="variantUpload";
+      if (csvType==="variantUpload") {
+        route="variantUpdateCsv"
+      } else {
+        route="productUploadCsv"
+      }
+      const res = await handleDocumentUpload(selectedFile!, merchantId,route);
 
       toast.success(res?.message);
       setSelectedFile(null);
     } catch (error: any) {
       console.error(error);
-      if (error.status === 400) {
-        if (error.response.data.error === "Missing data in CSV rows") {
-          setModelTitle(error.response.data.error);
-          setModelType("error");
-          setIsModalOpen(true);
-          setError(formatCSVErrors(error.response.data.details));
-        } else {
-          setModelTitle(error.response.data.error);
-          setModelType("error");
-          setIsModalOpen(true);
-          setError(error.response.data.message);
-        }
-      } else {
-        setModelTitle("Uploading Failed");
-        setModelType("error");
-        setIsModalOpen(true);
-        setError(error.response.data.error || "Internal server error");
-      }
+      // if (error.status === 400) {
+      //   if (error.response.data.error === "Missing data in CSV rows") {
+      //     setModelTitle(error.response.data.error);
+      //     setModelType("error");
+      //     setIsModalOpen(true);
+      //     setError(formatCSVErrors(error.response.data.details));
+      //   } else {
+      //     setModelTitle(error.response.data.error);
+      //     setModelType("error");
+      //     setIsModalOpen(true);
+      //     setError(error.response.data.message);
+      //   }
+      // } else {
+      //   setModelTitle("Uploading Failed");
+      //   setModelType("error");
+      //   setIsModalOpen(true);
+      //   setError(error.response.data.error || "Internal server error");
+      // }
+      setModelTitle(error.response.data.error);
+      setModelType("error");
+      setIsModalOpen(true);
+      setError(formatCSVErrors(error.response.data.details));
     } finally {
       setUploadLoading(false);
     }
@@ -408,8 +456,8 @@ const ProductManagement: React.FC = () => {
             {/* Bottom Buttons */}
             <div className="flex gap-4">
               <button
-                disabled={downloadLoading}
-                onClick={()=>downloadCsv("main")}
+                disabled={downloadLoadingMain}
+                onClick={() => downloadCsv("main")}
                 className="cursor-pointer px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all flex items-center gap-2"
               >
                 <svg
@@ -425,11 +473,13 @@ const ProductManagement: React.FC = () => {
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                   />
                 </svg>
-                {downloadLoading ? "Loading..." : "  Download Main Template"}
+                {downloadLoadingMain
+                  ? "Loading..."
+                  : "  Download Main Template"}
               </button>
               <button
-                disabled={downloadLoading}
-                onClick={()=>downloadCsv("variant")}
+                disabled={downloadLoadingMain}
+                onClick={() => downloadCsv("variant")}
                 className="cursor-pointer px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all flex items-center gap-2"
               >
                 <svg
@@ -445,7 +495,31 @@ const ProductManagement: React.FC = () => {
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                   />
                 </svg>
-                {downloadLoading ? "Loading..." : "  Download Variant Template"}
+                {downloadLoadingVariant
+                  ? "Loading..."
+                  : "  Download Variant Template"}
+              </button>
+              <button
+                disabled={downloadLoadingMain}
+                onClick={() => downloadCsv("variant_update")}
+                className="cursor-pointer px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all flex items-center gap-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                {updateLoadingVariant
+                  ? "Loading..."
+                  : "Update Variant Template"}
               </button>
               <button
                 onClick={handleFileUpload}

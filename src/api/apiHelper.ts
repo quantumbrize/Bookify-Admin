@@ -71,14 +71,14 @@ export const downloadCSV = async (url: string, type: string): Promise<Blob> => {
 
 
 // upload document 
-export const uploadDocument=async(file: File ,id:string)=>{
+export const uploadDocument=async(file: File ,id:string,apiRoute:string)=>{
   const formData = new FormData();
   formData.append("csvFile", file);
   // formData.append("taxyear", taxYear);
   // formData.append("file_type",file_type);
 
   try {
-    const { data } = await axiosInstance.post(`/catalogs/products/productUploadCsv/${id}`, formData, {
+    const { data } = await axiosInstance.post(`/catalogs/products/${apiRoute}/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

@@ -55,8 +55,8 @@ export const handleDocumentDownload = async (type:string) => {
 
 // document upload
 
-export const handleDocumentUpload = async (file: File ,id:string) => {
-  const res = await uploadDocument(file,id); // Pass the token here
+export const handleDocumentUpload = async (file: File ,id:string,apiRoute:string) => {
+  const res = await uploadDocument(file,id,apiRoute); // Pass the token here
 
   return res;
 };
